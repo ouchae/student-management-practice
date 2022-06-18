@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /**
+         * 정렬
+         * 1. margin-left: calc(50% - 본인너비/2)
+         * 2. text-align: center
+         * 3. 상위 태그를 만들어 diplay: flex; justify-content: center, align-items: center(수직)
+         */
+    </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <img src = "{{ url_for('static', filename='cat.jpeg') }}">
+    <h2>학생 정보 관리 페이지</h2>
+    학생 id : <input id="student-id"/> 학생 이름 : <input id="student-name"/> 학생 나이 : <input id="student-age"/>
+    <br>
+    <br>
+    저장 : <input type="radio" name="chk_info" value="POST">
+    수정 : <input type="radio" name="chk_info" value="PUT">
+    삭제 : <input type="radio" name="chk_info" value="DELETE">
+
+    <br>
+    <br>
+    <button onclick="btnClick()">학생 저장/수정/삭제하기</button>
+
+    <ul id="student-list">
+
+    </ul>
+    <script>
+        $.ajax({
+            type: "GET",
+            url: "/student",
+            data: {},
+            success: function(response) {
+                for (let student of response) {
+                    // Tempalte Literal
+                    // 'id : %s' % student.id
+                    // `id : ${student.id}`
+
+                    $("#student-list").append(`
+                        <li>
+                            id : ${student.id}, 이름 : ${student.name}, 나이 : ${student.age}
+                        </li>
+                    `)
+                }
+            }
+        })
+
+        function btnClick() {
+            let checked = $('input[name=chk_info]:checked').val();
+            if (checked === "POST") {
+                saveStudent()
+            }
+
+            if (checked === "PUT") {
+                updateStudent()
+            }
+
+            if (checked === "DELETE") {
+                deleteStudent()
+            }
+        }
+
+        function saveStudent() {
+            const clientName = $("#student-name").val()
+            const clientAge = $("#student-age").val()
+            $.ajax({
+                type: "POST",
+                url: "/student",
+                data: {
+                    name: clientName,
+                    age: clientAge
+                },
+                success: function(response) {
+                    location.reload()
+                }
+            })
+        }
+
+        function updateStudent() {
+            const clientId = $("#student-id").val()
+            const clientName = $("#student-name").val()
+            const clientAge = $("#student-age").val()
+            $.ajax({
+                type: "PUT",
+                url: "/student",
+                data: {
+                    id: clientId,
+                    name: clientName,
+                    age: clientAge
+                },
+                success: function(response) {
+                    location.reload()
+                }
+            })
+        }
+
+        function deleteStudent() {
+            const clientId = $("#student-id").val()
+            $.ajax({
+                type: "DELETE",
+                url: `/student?id=${clientId}`,
+                data: {},
+                success: function(response) {
+                    location.reload()
+                }
+            })
+        }
+    </script>
+
+</body>
+</html>
